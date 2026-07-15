@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Playwright / test artifacts
+.playwright-mcp/
+*.png

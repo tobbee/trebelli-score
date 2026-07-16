@@ -40,6 +40,31 @@ const I18N = {
     playAgainConfirm: "Clear the current scores and start a fresh 18-round game with the same players?",
     changePlayers: "Change players",
     gameOver: "Game over",
+    rules: "Rules",
+    rulesTitle: "How to play Tre Belli",
+    rulesSections: [
+      { h: "The game", p: [
+        "Tre Belli is a trick-taking card game for three players, played over 18 rounds with a standard deck. This app doesn't deal or play the cards — it keeps score while you play at the table.",
+      ] },
+      { h: "Rounds and modes", legend: true, p: [
+        "Each round has a leader who chooses the round's mode. The lead rotates round-robin, so every player leads six rounds and uses each of the six modes exactly once (6 modes × 3 players = 18 rounds).",
+        "The four suits make that suit trump. No Trump and Misère are played without a trump suit.",
+      ] },
+      { h: "The deal and the kitty", p: [
+        "Each player is dealt 13 cards, and 13 more form a kitty. The leader first announces the mode, then may buy from the kitty — taking cards by discarding the same number from their hand. The next player may then buy from whatever cards remain, and finally the third player if any are left.",
+      ] },
+      { h: "Playing the tricks", p: [
+        "Play is standard trick-taking. A player leads a card and the others follow, playing the led suit when they can. The highest trump wins the trick, or if no trump is played, the highest card of the led suit. In No Trump and Misère there is no trump, so the highest card of the led suit always wins.",
+      ] },
+      { h: "Targets and scoring", p: [
+        "Every round has 13 tricks. Each player has a target number of tricks: the leader 7, the next player 4, the third player 2.",
+        "Misère is the exception — there you want as few tricks as possible, so the targets flip to 2, 4 and 7.",
+        "Your score for the round is the tricks you took minus your target (for Misère, target minus tricks). Because the targets add up to 13, the three scores always sum to zero.",
+      ] },
+      { h: "Using this app", p: [
+        "Pick the leader's mode, then enter the tricks for the leader and the next player — the third player's tricks and everyone's scores are worked out for you. Running totals stay visible, and the scoreboard shows every round and who chose it. Undo the last round or start over from the menu.",
+      ] },
+    ],
     modes: { hearts: "Hearts", spades: "Spades", diamonds: "Diamonds", clubs: "Clubs", spel: "No Trump", pass: "Misère" },
   },
   sv: {
@@ -61,6 +86,31 @@ const I18N = {
     playAgainConfirm: "Nollställ poängen och starta en ny match på 18 omgångar med samma spelare?",
     changePlayers: "Byt spelare",
     gameOver: "Spelet slut",
+    rules: "Regler",
+    rulesTitle: "Så spelar man Tre Belli",
+    rulesSections: [
+      { h: "Spelet", p: [
+        "Tre Belli är ett sticktagningsspel för tre spelare som spelas över 18 omgångar med en vanlig kortlek. Appen delar inte ut eller spelar korten — den håller poängen medan ni spelar vid bordet.",
+      ] },
+      { h: "Omgångar och spelformer", legend: true, p: [
+        "Varje omgång har en ledare som väljer omgångens spelform. Ledarrollen roterar, så varje spelare leder sex omgångar och använder var och en av de sex spelformerna exakt en gång (6 spelformer × 3 spelare = 18 omgångar).",
+        "De fyra färgerna gör den färgen till trumf. Spel och Pass spelas utan trumf.",
+      ] },
+      { h: "Given och köphögen", p: [
+        "Varje spelare får 13 kort, och ytterligare 13 bildar köphögen. Ledaren väljer först spelform och får sedan köpa kort från köphögen genom att slänga lika många kort från handen. Nästa spelare får därefter köpa av de kort som är kvar, och till sist tredje spelaren om några återstår.",
+      ] },
+      { h: "Att spela sticken", p: [
+        "Spelet är vanlig sticktagning. En spelare spelar ut ett kort och de andra följer och lägger den utspelade färgen om de kan. Högsta trumfen tar sticket, eller om ingen trumf spelas det högsta kortet i den utspelade färgen. I Spel och Pass finns ingen trumf, så det högsta kortet i den utspelade färgen vinner alltid.",
+      ] },
+      { h: "Mål och poäng", p: [
+        "Varje omgång har 13 stick. Varje spelare har ett målantal stick: ledaren 7, nästa spelare 4 och tredje spelaren 2.",
+        "Pass är undantaget — där vill man ta så få stick som möjligt, så målen blir istället 2, 4 och 7.",
+        "Din poäng för omgången är antalet stick du tog minus ditt mål (för Pass: mål minus stick). Eftersom målen summerar till 13 blir de tre spelarnas poäng alltid noll tillsammans.",
+      ] },
+      { h: "Så använder du appen", p: [
+        "Välj ledarens spelform och mata in sticken för ledaren och nästa spelare — tredje spelarens stick och allas poäng räknas ut åt dig. Totalpoängen syns hela tiden, och poängtavlan visar varje omgång och vem som valde den. Ångra senaste omgången eller börja om från menyn.",
+      ] },
+    ],
     modes: { hearts: "Hjärter", spades: "Spader", diamonds: "Ruter", clubs: "Klöver", spel: "Spel", pass: "Pass" },
   },
 };
@@ -83,6 +133,7 @@ let state = {
   nextTricks: 0,
   lang: defaultLang(),
   showScoreboard: false,
+  showRules: false,
   menuOpen: false,
 };
 
@@ -252,7 +303,9 @@ function renderSetup() {
         ${inputs}
         <button type="submit" class="start-btn" ${canStart ? "" : "disabled"}>${esc(L.startGame)}</button>
       </form>
-    </div>`;
+      <button class="rules-link" data-act="rules">${esc(L.rules)}</button>
+    </div>
+    ${state.showRules ? renderRulesOverlay() : ""}`;
 }
 
 function langSeg(onFelt) {
@@ -280,7 +333,8 @@ function renderGame() {
         <div class="main">${over ? renderGameOver() : renderRound()}</div>
       </div>
     </div>
-    ${state.showScoreboard ? renderScoreboardOverlay() : ""}`;
+    ${state.showScoreboard ? renderScoreboardOverlay() : ""}
+    ${state.showRules ? renderRulesOverlay() : ""}`;
 }
 
 function renderMenu() {
@@ -288,6 +342,8 @@ function renderMenu() {
   const dis = state.rounds.length === 0 ? "disabled" : "";
   return `
     <div class="menu" id="menu">
+      <button data-act="rules">${esc(L.rules)}</button>
+      <div class="sep"></div>
       <button data-act="undo" ${dis}>${esc(L.undo)}</button>
       <button data-act="playagain" ${dis}>${esc(L.playAgain)}</button>
       <button data-act="changeplayers">${esc(L.changePlayers)}</button>
@@ -430,6 +486,26 @@ function renderScoreboardOverlay() {
   </div>`;
 }
 
+function renderRulesOverlay() {
+  const L = t();
+  const legend = MODES.map((m) =>
+    `<span class="rule-mode">${modeIcon(m)} ${esc(L.modes[m])}</span>`).join("");
+  const sections = L.rulesSections.map((sec) => {
+    const paras = sec.p.map((para) => `<p>${esc(para)}</p>`).join("");
+    const leg = sec.legend ? `<div class="rule-legend">${legend}</div>` : "";
+    return `<section><h3>${esc(sec.h)}</h3>${paras}${leg}</section>`;
+  }).join("");
+  return `<div class="overlay" data-act="closerules">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2>${esc(L.rulesTitle)}</h2>
+        <button data-act="closerules">${esc(L.done)}</button>
+      </div>
+      <div class="rules">${sections}</div>
+    </div>
+  </div>`;
+}
+
 function renderGameOver() {
   const L = t();
   return `<div>
@@ -482,18 +558,22 @@ function onClick(e) {
   }
   const act = actEl.dataset.act;
 
-  // Scoreboard closes only on the Done button or a click on the backdrop
+  // Overlays close only on their Done button or a click on the backdrop
   // itself — never on clicks inside the sheet (which bubble up to the overlay).
-  if (act === "closeboard") {
+  if (act === "closeboard" || act === "closerules") {
     const isDoneButton = actEl.tagName === "BUTTON";
     const clickedBackdrop = e.target === actEl && actEl.classList.contains("overlay");
-    if (isDoneButton || clickedBackdrop) { state.showScoreboard = false; render(); }
+    if (isDoneButton || clickedBackdrop) {
+      if (act === "closeboard") state.showScoreboard = false; else state.showRules = false;
+      render();
+    }
     return;
   }
 
   switch (act) {
     case "menu": state.menuOpen = !state.menuOpen; render(); break;
     case "scoreboard": state.showScoreboard = true; state.menuOpen = false; render(); break;
+    case "rules": state.showRules = true; state.menuOpen = false; render(); break;
     case "changemode": clearMode(); break;
     case "confirm": confirmRound(); break;
     case "undo": undoLastRound(); break;

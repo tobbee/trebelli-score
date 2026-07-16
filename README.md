@@ -1,5 +1,7 @@
 # Tre Belli — web scorer
 
+**▶ Play it: https://tobbee.github.io/trebelli-score/**
+
 A score-keeping companion for the 3-player trick-taking card game **Tre Belli**,
 as a self-contained static web page. It's the web counterpart to the native
 iPad/iPhone app: enter three player names, walk through all 18 rounds
@@ -45,9 +47,11 @@ python3 -m http.server 8000
 # then open http://localhost:8000
 ```
 
-To deploy, copy `index.html`, `styles.css`, and `app.js` to any static host
-(nginx/Apache, GitHub Pages, Netlify, an S3 bucket, a Raspberry Pi …). No
-backend required.
+This repo is published with **GitHub Pages** from `main` at
+<https://tobbee.github.io/trebelli-score/> — every push to `main` redeploys it.
+To host it elsewhere, copy `index.html`, `styles.css`, and `app.js` to any
+static host (nginx/Apache, Netlify, an S3 bucket, a Raspberry Pi …). No backend
+required.
 
 ## Files
 
